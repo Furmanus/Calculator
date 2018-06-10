@@ -1,0 +1,32 @@
+.flexbox {
+  display: flex;
+
+  &-row {
+    flex-direction: row;
+  }
+  &-column {
+    flex-direction: column;
+  }
+  .vertical-center {
+    justify-content: center;
+  }
+  .vertical-start {
+    justify-content: flex-start;
+  }
+  .vertical-end {
+    justify-content: flex-end;
+  }
+}
+.center {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.inline_block {
+  display: inline;
+}
+.font {
+  &-small {
+    font-size: 16px !important;
+  }
+}

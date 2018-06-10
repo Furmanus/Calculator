@@ -1,0 +1,26 @@
+{
+  "name": "calculator",
+  "version": "1.0.0",
+  "description": "Simple scientific calculator in TypeScript",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack --watch",
+    "test": "lessc ./src/styles/entry.less ./dist/bundle.css"
+  },
+  "keywords": [
+    "calculator",
+    "typescript"
+  ],
+  "author": "Łukasz Lach",
+  "license": "ISC",
+  "dependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
+    "less": "^3.0.4",
+    "ts-loader": "^4.3.0",
+    "typescript": "^2.8.3",
+    "webpack": "^4.9.1",
+    "webpack-cli": "^2.1.4"
+  }
+}

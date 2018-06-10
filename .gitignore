@@ -1,0 +1,5 @@
+./dist/bundle.js
+./dist/bundle.css
+node_modules
+package-lock.json
+.idea

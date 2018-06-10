@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link type="text/css" rel="stylesheet" href="bundle.css">
+    <title>Calculator</title>
+</head>
+<body>
+    <div class="main">
+        <div class="canvas-container"></div>
+        <div class="calculator-container">
+            <div class="calculator">
+                <p class="last-operation" data-calc-text></p>
+                <div class="calculator-display" role="textbox"></div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <button type="button" data-calc-button="(" class="calculator-button">(</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button=")" class="calculator-button">)</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="cancel" class="calculator-button">C</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="1" class="calculator-button">1</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="2" class="calculator-button">2</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="3" class="calculator-button">3</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="/" class="calculator-button">/</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <button type="button" data-calc-button="ln" class="calculator-button">ln</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="&#960" class="calculator-button">&#960</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="sin" class="calculator-button">sin</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="4" class="calculator-button">4</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="5" class="calculator-button">5</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="6" class="calculator-button">6</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="*" class="calculator-button">*</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <button type="button" data-calc-button="log" class="calculator-button font-small">
+                                    log<sub>x</sub>y
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="&#119890" class="calculator-button">&#119890</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="cos" class="calculator-button">cos</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="7" class="calculator-button">7</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="8" class="calculator-button">8</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="9" class="calculator-button">9</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="-" class="calculator-button">-</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <button type="button" data-calc-button="!" class="calculator-button">x!</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="^" class="calculator-button">x<sup>y</sup></button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="tg" class="calculator-button">tg</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="0" class="calculator-button">0</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="." class="calculator-button">.</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="=" class="calculator-button">=</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="+" class="calculator-button">+</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="./bundle.js"></script>
+</body>
+</html>
