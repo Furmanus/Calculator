@@ -1,5 +1,4 @@
-dist/bundle.css
-dist/bundle.js
+dist
 node_modules
 package-lock.json
 .idea
