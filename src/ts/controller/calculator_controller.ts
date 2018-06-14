@@ -11,7 +11,8 @@ export class CalculatorController extends Observer{
     private model: CalculatorModel;
     private expectedSecondArgument: boolean = false;
     private specialFunctionOpened: string[] = [];
-    private subscriptOpen: boolean = false;
+    private subscriptOpen: number = 0;
+    private superscriptOpen: number = 0;
 
     constructor() {
         super();
@@ -35,6 +36,7 @@ export class CalculatorController extends Observer{
     }
     onCalcCancelButtonClick(): void {
         this.view.resetLastOperation();
+        this.view.resetSubSupCount();
         this.model.reset();
     }
     onEqualButtonClick(): void {
@@ -44,45 +46,63 @@ export class CalculatorController extends Observer{
         this.view.resetDisplay();
     }
     onSpecialFunctionButtonClick(data: {value: string}): void {
-        if (')' !== data.value) {
-            this.specialFunctionOpened.push(data.value);
-        }
-
         switch (data.value) {
             case '(':
+                this.specialFunctionOpened.push(data.value);
                 this.model.updateOperations(data.value);
                 break;
             case ')':
-                if (true === this.expectedSecondArgument) {
-                    this.expectedSecondArgument = false;
-                    if (this.subscriptOpen) {
+                if ('second_argument' === this.specialFunctionOpened[this.specialFunctionOpened.length - 1]) {
+                    this.specialFunctionOpened.pop();
+                    if (this.subscriptOpen > 0) {
                         this.model.updateOperations(')');
                         this.view.stopSubscript();
                         this.model.updateOperations('(');
-                        this.subscriptOpen = false;
+                        this.subscriptOpen--;
                     }
                 } else if (this.specialFunctionOpened.length > 0) {
                     this.model.updateOperations(data.value);
                     this.performPartialCalculation(<string>this.specialFunctionOpened.pop());
+                    
+                    if (this.superscriptOpen > 0) {
+                        this.view.stopSuperscript();
+                        this.superscriptOpen--;
+                    }
                 }
                 break;
             case '!':
+                this.specialFunctionOpened.push(data.value);
                 this.model.updateOperations(`${data.value}`);
                 this.performPartialCalculation(<string>this.specialFunctionOpened.pop());
                 break;
             case 'log':
-                this.expectedSecondArgument = true;
-                this.model.updateOperations(`${data.value}`);
-                this.view.startSubscript();
-                this.subscriptOpen = true;
-                this.model.updateOperations('(');
+                if (this.subscriptOpen < 2) {
+                    this.specialFunctionOpened.push(data.value);
+                    this.specialFunctionOpened.push('second_argument');
+                    this.model.updateOperations(`${data.value}`);
+                    this.view.startSubscript();
+                    this.subscriptOpen++;
+                    this.model.updateOperations('(');
+                }
+                break;
+            case '^':
+                if (this.superscriptOpen < 2) {
+                    this.specialFunctionOpened.push(data.value);
+                    this.superscriptOpen++;
+                    this.view.startSuperscript();
+                    this.model.updateOperations(`${data.value}(`);
+                }
                 break;
             default:
+                this.specialFunctionOpened.push(data.value);
                 this.model.updateOperations(`${data.value}(`);
         }
     }
     onCalcOperationsModelUpdated(data: IModelCalculationPartialDisplay): void {
-        this.view.addToDisplay(data.value);
+        const filteredValue = data.value.replace(/[\^]/g, function (match) {
+            return '';
+        });
+        this.view.addToDisplay(filteredValue);
     }
     public performPartialCalculation(value: string): void {
         const modelPartialResult: string = this.model.getPartialResult();

@@ -1,7 +1,8 @@
 import {Observer} from '../core/observer';
 import {EventEnum} from '../enums/event_enums';
 import {specialFunctions} from "../enums/special_functions";
-import {replaceLast} from "../helpers/misc_helper";
+import {replaceLast, replaceNth} from "../helpers/misc_helper";
+import * as config from '../globals/config';
 
 
 
@@ -9,7 +10,11 @@ export class CalculatorView extends Observer{
     private buttons: NodeList;
     private display: HTMLDivElement | null;
     private lastOperationText: HTMLParagraphElement | null;
-    private subscriptOpen: boolean = false;
+    private subscriptOpen: number = 0;
+    private maxSubscriptOpen: number = 0;
+    private superscriptOpen: number = 0;
+    private maxSuperscriptOpen: number = 0;
+    private lastSpecialDisplay: string[] = [];
 
     public constructor() {
         super();
@@ -40,10 +45,20 @@ export class CalculatorView extends Observer{
         this.getDisplay().innerHTML = '';
     }
     public addToDisplay(value: string): void {
-        const innerHtml = this.getDisplay().innerHTML;
-        if (this.subscriptOpen) {
-            this.getDisplay().innerHTML = replaceLast(innerHtml,'</sub>', `${value}</sub>`);
-        } else {
+        const innerHtml: string = this.getDisplay().innerHTML;
+        const lastSpecialDisplay: string = this.lastSpecialDisplay[this.lastSpecialDisplay.length - 1];
+        const sub: number = this.subscriptOpen;
+        const sup: number = this.superscriptOpen;
+        const maxSub: number = this.maxSubscriptOpen;
+        const maxSup: number = this.maxSuperscriptOpen;
+        let valueOccurence;
+        if ('sub' === lastSpecialDisplay && sub) {
+            valueOccurence = (maxSub === sub) ? 1 : maxSub;
+            this.getDisplay().innerHTML = replaceNth(valueOccurence, innerHtml,'</sub>', `${value}</sub>`);
+        } else if ('sup' === lastSpecialDisplay && sup) {
+            valueOccurence = (maxSup === sup) ? 1 : maxSup;
+            this.getDisplay().innerHTML = replaceNth(valueOccurence, innerHtml,'</sup>', `${value}</sup>`);
+        }else {
             this.getDisplay().innerHTML += value;
         }
     }
@@ -57,11 +72,58 @@ export class CalculatorView extends Observer{
         this.getLastOperation().innerHTML = '';
     }
     public startSubscript(): void {
-        this.subscriptOpen = true;
-        this.getDisplay().innerHTML += '<sub></sub>';
+        const innerHtml: string = this.getDisplay().innerHTML;
+        let fontSize: number = config.DISPLAY_FONT_SIZE;
+        const subStyle: string = `"font-size: ${(fontSize /= (this.subscriptOpen + 1) * 2) + 2}px !important;"`;
+        this.lastSpecialDisplay.push('sub');
+
+        if (this.subscriptOpen) {
+            this.getDisplay().innerHTML = replaceLast(
+                innerHtml,
+                `</sub>`,
+                `<sub style=${subStyle}></sub></sub>`
+            );
+        } else {
+            this.getDisplay().innerHTML += `<sub style=${subStyle}></sub>`;
+        }
+        this.subscriptOpen++;
+        this.maxSubscriptOpen++;
     }
     public stopSubscript(): void {
-        this.subscriptOpen = false;
+        this.subscriptOpen--;
+        this.lastSpecialDisplay.pop();
+        if (0 === this.subscriptOpen) {
+            this.maxSubscriptOpen = 0;
+        }
+    }
+    public startSuperscript(): void {
+        const innerHtml: string = this.getDisplay().innerHTML;
+        let fontSize: number = config.DISPLAY_FONT_SIZE;
+        const supStyle: string = `"font-size: ${(fontSize /= (this.subscriptOpen + 1) * 2) + 2}px !important;"`;
+        this.lastSpecialDisplay.push('sup');
+
+        if (this.superscriptOpen) {
+            this.getDisplay().innerHTML = replaceLast(
+                innerHtml,
+                `</sup>`,
+                `<sup style=${supStyle}></sup></sup>`
+            );
+        } else {
+            this.getDisplay().innerHTML += `<sup style=${supStyle}></sup>`;
+        }
+        this.superscriptOpen++;
+        this.maxSuperscriptOpen++;
+    }
+    public stopSuperscript(): void {
+        this.superscriptOpen--;
+        this.lastSpecialDisplay.pop();
+        if (0 === this.superscriptOpen) {
+            this.maxSuperscriptOpen = 0;
+        }
+    }
+    public resetSubSupCount(): void {
+        this.subscriptOpen = 0;
+        this.maxSubscriptOpen = 0;
     }
     private onCalculatorButtonNumberClick(value: string): void {
         this.notify(EventEnum.CALCULATOR_BUTTON_CLICKED, {value: value});

@@ -32,14 +32,17 @@ export function calculateFactorial(partialResult: string): ICalculationResult {
     };
 }
 export function calculateLogarithm(partialResult: string): number {
-    console.log(partialResult);
+    const lastOpeningBracket = partialResult.lastIndexOf('(');
+    const lastClosingBracket = partialResult.lastIndexOf(')');
+    const beforeLastOpeningBracket = partialResult.lastIndexOf('(', lastOpeningBracket - 1);
+    const beforeLastClosingBracket = partialResult.lastIndexOf(')', lastClosingBracket - 1);
     const firstBracketsContent: string = partialResult.substring(
-        partialResult.indexOf('(') + 1,
-        partialResult.indexOf(')')
+        beforeLastOpeningBracket + 1,
+        beforeLastClosingBracket
     );
     const secondBracketsContent: string = partialResult.substring(
-        partialResult.lastIndexOf('(') + 1,
-        partialResult.lastIndexOf(')')
+        lastOpeningBracket + 1,
+        lastClosingBracket
     );
     return (specialFunctionFromMath['log'](eval(firstBracketsContent))
         / specialFunctionFromMath['log'](eval(secondBracketsContent)));
@@ -47,8 +50,8 @@ export function calculateLogarithm(partialResult: string): number {
 export function calculatePower(partialResult: string): ICalculationResult {
     const lastFunctionOccurence: number = partialResult.lastIndexOf('^');
     const bracketsContent: string = partialResult.substring(
-        partialResult.indexOf('(') + 1,
-        partialResult.indexOf(')')
+        partialResult.lastIndexOf('(') + 1,
+        partialResult.lastIndexOf(')')
     );
     let beforeFunctionFirstValueIndex: number = lastFunctionOccurence - 1;
     let beforeFunctionFirstValue: string;

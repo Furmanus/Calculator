@@ -1,0 +1,1 @@
+export const DISPLAY_FONT_SIZE = 24;
