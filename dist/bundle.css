@@ -46,19 +46,41 @@ body {
   border: 1px solid black;
 }
 @media screen and (min-width: 600px) {
-  .canvas-container {
+  .svg-container {
     display: inline-block;
     margin: 0;
     width: 50%;
     height: 100%;
     float: left;
   }
+  .svg-container-inner {
+    position: relative;
+    width: 80%;
+    height: 80%;
+    max-width: 400px;
+    max-height: 400px;
+  }
+  .svg-container svg {
+    width: 100%;
+    height: 100%;
+    background: #233455;
+  }
 }
 @media screen and (max-width: 600px) {
-  .canvas-container {
+  .svg-container {
     display: block;
     width: 100%;
     height: 50%;
+  }
+  .svg-container-inner {
+    position: relative;
+    width: 90%;
+    height: 90%;
+  }
+  .svg-container svg {
+    width: 100%;
+    height: 100%;
+    background: #233455;
   }
 }
 @media screen and (min-width: 600px) {
