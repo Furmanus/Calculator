@@ -7,7 +7,11 @@
 </head>
 <body>
     <div class="main">
-        <div class="canvas-container"></div>
+        <div class="svg-container">
+            <div class="svg-container-inner center">
+                <svg id="plot"></svg>
+            </div>
+        </div>
         <div class="calculator-container">
             <div class="calculator">
                 <p class="last-operation" data-calc-text></p>
@@ -106,6 +110,14 @@
                             </td>
                             <td>
                                 <button type="button" data-calc-button="+" class="calculator-button">+</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <button type="button" data-calc-button="x" class="calculator-button">x</button>
+                            </td>
+                            <td>
+                                <button type="button" data-calc-button="plot" class="calculator-button font-small">plot</button>
                             </td>
                         </tr>
                     </tbody>
