@@ -34,7 +34,11 @@ export class CalculatorView extends Observer{
                 button.addEventListener('click', this.onEqualButtonClick.bind(this));
             } else if (calcButtonValue && specialFunctions[calcButtonValue]) {
                 button.addEventListener('click', this.onCalculatorSpecialFunctionClick.bind(this, calcButtonValue));
-            }else {
+            } else if ('x' === calcButtonValue) {
+                button.addEventListener('click', this.onVariableButtonClick.bind(this));
+            } else if ('plot' === calcButtonValue) {
+                button.addEventListener('click', this.onSolveButtonClick.bind(this));
+            } else {
                 button.addEventListener('click', this.onCalculatorButtonNumberClick.bind(this, calcButtonValue));
             }
 
@@ -136,6 +140,12 @@ export class CalculatorView extends Observer{
     }
     private onEqualButtonClick(): void {
         this.notify(EventEnum.CALCULATOR_EQUAL_CLICKED);
+    }
+    private onVariableButtonClick(): void {
+        this.notify(EventEnum.CALCULATOR_VARIABLE_CLICKED);
+    }
+    private onSolveButtonClick(): void {
+        this.notify(EventEnum.CALCULATOR_SOLVE_CLICKED);
     }
     private getDisplay(): HTMLDivElement {
         if (this.display) {

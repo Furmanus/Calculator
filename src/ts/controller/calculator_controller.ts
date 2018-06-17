@@ -9,10 +9,10 @@ import * as calculationHelper from '../helpers/calculation_helper';
 export class CalculatorController extends Observer{
     private view: CalculatorView;
     private model: CalculatorModel;
-    private expectedSecondArgument: boolean = false;
     private specialFunctionOpened: string[] = [];
     private subscriptOpen: number = 0;
     private superscriptOpen: number = 0;
+    private plotMode: boolean = false;
 
     constructor() {
         super();
@@ -21,31 +21,46 @@ export class CalculatorController extends Observer{
         this.model = new CalculatorModel();
         this.attachEvents();
     }
-    attachEvents(): void {
+    private attachEvents(): void {
         this.view.on(this, EventEnum.CALCULATOR_BUTTON_CLICKED, this.onCalcButtonClick.bind(this));
         this.view.on(this, EventEnum.CALCULATOR_CANCEL_CLICKED, this.onCalcCancelButtonClick.bind(this));
         this.view.on(this, EventEnum.CALCULATOR_EQUAL_CLICKED, this.onEqualButtonClick.bind(this));
         this.view.on(this, EventEnum.CALCULATOR_SPECIAL_FUNCTION_CLICKED, this.onSpecialFunctionButtonClick.bind(this));
+        this.view.on(this, EventEnum.CALCULATOR_VARIABLE_CLICKED, this.onVariableButtonClick.bind(this));
+        this.view.on(this, EventEnum.CALCULATOR_SOLVE_CLICKED, this.onSolveButtonClick.bind(this));
 
         this.model.on(this, EventEnum.CALCULATOR_MODEL_UPDATED, this.onCalcOperationsModelUpdated.bind(this));
         this.model.on(this, EventEnum.CALCULATOR_MODEL_SCORE_CALCULATED, this.onCalcModelScoreCalculated.bind(this));
         this.model.on(this, EventEnum.CALCULATOR_MODEL_RESET, this.onCalcModelReset.bind(this));
     }
-    onCalcButtonClick(data: {value: string}): void {
+    private onCalcButtonClick(data: {value: string}): void {
         this.model.updateOperations(data.value);
     }
-    onCalcCancelButtonClick(): void {
+    private onCalcCancelButtonClick(): void {
         this.view.resetLastOperation();
         this.view.resetSubSupCount();
         this.model.reset();
     }
-    onEqualButtonClick(): void {
+    private onEqualButtonClick(): void {
         this.model.calculateScore();
     }
-    onCalcModelReset(): void {
+    private onVariableButtonClick(): void {
+        this.model.updateOperations('x');
+        this.plotMode = true;
+    }
+    private onSolveButtonClick(): void {
+        const modelFunction = this.model.getResult();
+
+        if (this.plotMode) {
+            this.notify(EventEnum.CALCULATOR_SOLVE_CLICKED, {
+                data: modelFunction
+            });
+        }
+    }
+    private onCalcModelReset(): void {
         this.view.resetDisplay();
     }
-    onSpecialFunctionButtonClick(data: {value: string}): void {
+    private onSpecialFunctionButtonClick(data: {value: string}): void {
         switch (data.value) {
             case '(':
                 this.specialFunctionOpened.push(data.value);
@@ -98,19 +113,23 @@ export class CalculatorController extends Observer{
                 this.model.updateOperations(`${data.value}(`);
         }
     }
-    onCalcOperationsModelUpdated(data: IModelCalculationPartialDisplay): void {
+    private onCalcOperationsModelUpdated(data: IModelCalculationPartialDisplay): void {
         const filteredValue = data.value.replace(/[\^]/g, function (match) {
             return '';
         });
         this.view.addToDisplay(filteredValue);
     }
-    public performPartialCalculation(value: string): void {
+    private performPartialCalculation(value: string): void {
         const modelPartialResult: string = this.model.getPartialResult();
         const lastFunctionOccurence: number = modelPartialResult.lastIndexOf(value);
         const lastClosingBracketOccurence: number = modelPartialResult.lastIndexOf(')');
         let partialResultToEval: string = modelPartialResult.substring(lastFunctionOccurence, lastClosingBracketOccurence + 1);
         let evaluatedPartialResult: number;
         let bracketsContent: string;
+
+        if (this.plotMode) {
+            return;
+        }
 
         if ('(' === value) {
             evaluatedPartialResult = eval(partialResultToEval);
@@ -151,7 +170,7 @@ export class CalculatorController extends Observer{
             ));
         }
     }
-    onCalcModelScoreCalculated(data: IModelCalculationResult): void {
+    private onCalcModelScoreCalculated(data: IModelCalculationResult): void {
         const {
             result
         } = data;
