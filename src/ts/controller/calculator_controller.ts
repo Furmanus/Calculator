@@ -42,19 +42,21 @@ export class CalculatorController extends Observer{
         this.model.reset();
     }
     private onEqualButtonClick(): void {
-        this.model.calculateScore();
+        if (this.plotMode) {
+            this.model.forceSetResult(NaN);
+        } else {
+            this.model.calculateScore();
+        }
     }
     private onVariableButtonClick(): void {
         this.model.updateOperations('x');
         this.plotMode = true;
     }
     private onSolveButtonClick(): void {
-        const modelFunction = this.model.getResult();
+        const modelFunction = this.model.getPartialResult();
 
         if (this.plotMode) {
-            this.notify(EventEnum.CALCULATOR_SOLVE_CLICKED, {
-                data: modelFunction
-            });
+            this.notify(EventEnum.CALCULATOR_SOLVE_CLICKED, modelFunction);
         }
     }
     private onCalcModelReset(): void {
@@ -124,12 +126,8 @@ export class CalculatorController extends Observer{
         const lastFunctionOccurence: number = modelPartialResult.lastIndexOf(value);
         const lastClosingBracketOccurence: number = modelPartialResult.lastIndexOf(')');
         let partialResultToEval: string = modelPartialResult.substring(lastFunctionOccurence, lastClosingBracketOccurence + 1);
-        let evaluatedPartialResult: number;
+        let evaluatedPartialResult: number | string;
         let bracketsContent: string;
-
-        if (this.plotMode) {
-            return;
-        }
 
         if ('(' === value) {
             evaluatedPartialResult = eval(partialResultToEval);
@@ -157,18 +155,17 @@ export class CalculatorController extends Observer{
                     lastFunctionOccurence + 1
                 );
             } else {
-                evaluatedPartialResult = specialFunctionFromMath[value](eval(bracketsContent));
+                if (/x/.test(bracketsContent)) {
+                    evaluatedPartialResult = `${value}(${bracketsContent})`;
+                } else {
+                    evaluatedPartialResult = specialFunctionFromMath[value](eval(bracketsContent));
+                }
             }
         }
-
-        if (isNaN(evaluatedPartialResult)) {
-            this.model.forceSetResult(NaN);
-        } else {
-            this.model.setPartialResult(modelPartialResult.replace(
-                partialResultToEval,
-                evaluatedPartialResult.toString()
-            ));
-        }
+        this.model.setPartialResult(modelPartialResult.replace(
+            partialResultToEval,
+            evaluatedPartialResult.toString()
+        ));
     }
     private onCalcModelScoreCalculated(data: IModelCalculationResult): void {
         const {
@@ -182,5 +179,8 @@ export class CalculatorController extends Observer{
             this.view.updateLastOperation();
             this.view.updateDisplay(result.toString());
         }
+    }
+    private isVariablePresentInPartialResult(partialResult: string): boolean {
+        return /x+/g.test(partialResult);
     }
 }
