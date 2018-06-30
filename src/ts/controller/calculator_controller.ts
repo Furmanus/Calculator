@@ -2,7 +2,6 @@ import {CalculatorView} from '../views/calculator_view';
 import {Observer} from '../core/observer';
 import {EventEnum} from "../enums/event_enums";
 import {CalculatorModel, IModelCalculationPartialDisplay, IModelCalculationResult} from '../model/calculator_model';
-import {ButtonEnum} from "../enums/button_enums";
 import {specialFunctionFromMath} from '../enums/special_functions';
 import * as calculationHelper from '../helpers/calculation_helper';
 
@@ -12,7 +11,6 @@ export class CalculatorController extends Observer{
     private specialFunctionOpened: string[] = [];
     private subscriptOpen: number = 0;
     private superscriptOpen: number = 0;
-    private plotMode: boolean = false;
 
     constructor() {
         super();
@@ -26,8 +24,6 @@ export class CalculatorController extends Observer{
         this.view.on(this, EventEnum.CALCULATOR_CANCEL_CLICKED, this.onCalcCancelButtonClick.bind(this));
         this.view.on(this, EventEnum.CALCULATOR_EQUAL_CLICKED, this.onEqualButtonClick.bind(this));
         this.view.on(this, EventEnum.CALCULATOR_SPECIAL_FUNCTION_CLICKED, this.onSpecialFunctionButtonClick.bind(this));
-        this.view.on(this, EventEnum.CALCULATOR_VARIABLE_CLICKED, this.onVariableButtonClick.bind(this));
-        this.view.on(this, EventEnum.CALCULATOR_SOLVE_CLICKED, this.onSolveButtonClick.bind(this));
 
         this.model.on(this, EventEnum.CALCULATOR_MODEL_UPDATED, this.onCalcOperationsModelUpdated.bind(this));
         this.model.on(this, EventEnum.CALCULATOR_MODEL_SCORE_CALCULATED, this.onCalcModelScoreCalculated.bind(this));
@@ -43,19 +39,6 @@ export class CalculatorController extends Observer{
     }
     private onEqualButtonClick(): void {
         this.model.calculateScore();
-    }
-    private onVariableButtonClick(): void {
-        this.model.updateOperations('x');
-        this.plotMode = true;
-    }
-    private onSolveButtonClick(): void {
-        const modelFunction = this.model.getResult();
-
-        if (this.plotMode) {
-            this.notify(EventEnum.CALCULATOR_SOLVE_CLICKED, {
-                data: modelFunction
-            });
-        }
     }
     private onCalcModelReset(): void {
         this.view.resetDisplay();
@@ -114,7 +97,7 @@ export class CalculatorController extends Observer{
         }
     }
     private onCalcOperationsModelUpdated(data: IModelCalculationPartialDisplay): void {
-        const filteredValue = data.value.replace(/[\^]/g, function (match) {
+        const filteredValue = data.value.replace(/[\^]/g, function () {
             return '';
         });
         this.view.addToDisplay(filteredValue);
@@ -126,10 +109,6 @@ export class CalculatorController extends Observer{
         let partialResultToEval: string = modelPartialResult.substring(lastFunctionOccurence, lastClosingBracketOccurence + 1);
         let evaluatedPartialResult: number;
         let bracketsContent: string;
-
-        if (this.plotMode) {
-            return;
-        }
 
         if ('(' === value) {
             evaluatedPartialResult = eval(partialResultToEval);
