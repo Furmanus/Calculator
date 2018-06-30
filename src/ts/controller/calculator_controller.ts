@@ -1,7 +1,11 @@
 import {CalculatorView} from '../views/calculator_view';
 import {Observer} from '../core/observer';
-import {EventEnum} from "../enums/event_enums";
-import {CalculatorModel, IModelCalculationPartialDisplay, IModelCalculationResult} from '../model/calculator_model';
+import {EventEnum} from '../enums/event_enums';
+import {
+    CalculatorModel,
+    IModelCalculationPartialDisplay,
+    IModelCalculationResult
+} from '../model/calculator_model';
 import {specialFunctionFromMath} from '../enums/special_functions';
 import * as calculationHelper from '../helpers/calculation_helper';
 
@@ -11,6 +15,7 @@ export class CalculatorController extends Observer{
     private specialFunctionOpened: string[] = [];
     private subscriptOpen: number = 0;
     private superscriptOpen: number = 0;
+    private preventSuperscriptCloseCounter: number = 0;
 
     constructor() {
         super();
@@ -48,6 +53,9 @@ export class CalculatorController extends Observer{
             case '(':
                 this.specialFunctionOpened.push(data.value);
                 this.model.updateOperations(data.value);
+                if (this.superscriptOpen) {
+                    this.preventSuperscriptCloseCounter++;
+                }
                 break;
             case ')':
                 if ('second_argument' === this.specialFunctionOpened[this.specialFunctionOpened.length - 1]) {
@@ -63,8 +71,12 @@ export class CalculatorController extends Observer{
                     this.performPartialCalculation(<string>this.specialFunctionOpened.pop());
                     
                     if (this.superscriptOpen > 0) {
-                        this.view.stopSuperscript();
-                        this.superscriptOpen--;
+                        if (this.preventSuperscriptCloseCounter) {
+                            this.preventSuperscriptCloseCounter--;
+                        } else {
+                            this.view.stopSuperscript();
+                            this.superscriptOpen--;
+                        }
                     }
                 }
                 break;
