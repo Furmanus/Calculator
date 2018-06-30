@@ -1,21 +1,8 @@
-@media screen and (min-width: 600px){
-  .calculator-container {
-    display: inline-block;
-    margin: 0;
-    width: 50%;
-    height: 100%;
-    float: right;
-  }
-}
-@media screen and (max-width: 600px){
-  .calculator-container {
-    display: block;
-    width: 100%;
-    height: 50%;
-  }
-}
 .calculator-container {
   margin: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 .calculator {
   position: relative;
@@ -26,11 +13,7 @@
   font-family: "Courier New", Courier, monospace;
 
   table {
-    float: right;
-
-    tr {
-      float: right;
-    }
+    margin: 0 auto;
   }
   .last-operation {
     width: calc(100% - 16px);
